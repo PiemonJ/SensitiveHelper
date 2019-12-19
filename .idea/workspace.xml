@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="ea6e1326-9217-450a-ac66-af2bf524f12c" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="package-info" />
+        <option value="AnnotationType" />
+        <option value="Enum" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="mavenHome" value="D:/env/maven/apache-maven-3.6.2-bin/apache-maven-3.6.2" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
+  <component name="ProjectId" id="1V3kZGbd4vcLZc7eM9Qmmjlt2As" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="configurable.group.appearance" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.github.sensitive.enums" />
+      <recent name="com.github.sensitive.plugin" />
+      <recent name="com.github.sensitive.annotation" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\workspace\java\enjoy\SensitiveHelper\src\main\java\com\github\sensitive\annotation" />
+      <recent name="D:\workspace\java\enjoy\SensitiveHelper\src\main\java\com\github\sensitive\plugin\strategy" />
+      <recent name="D:\workspace\java\enjoy\SensitiveHelper\src\main\java\com\github\sensitive\alias" />
+    </key>
+  </component>
+  <component name="ServiceViewManager">
+    <option name="viewStates">
+      <list>
+        <serviceView>
+          <treeState>
+            <expand />
+            <select />
+          </treeState>
+        </serviceView>
+      </list>
+    </option>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ea6e1326-9217-450a-ac66-af2bf524f12c" name="Default Changelist" comment="" />
+      <created>1576489219613</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1576489219613</updated>
+      <workItem from="1576489223194" duration="5728000" />
+      <workItem from="1576665399002" duration="3752000" />
+      <workItem from="1576743375171" duration="9901000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="530" y="58" key="#com.intellij.ide.util.MemberChooser" timestamp="1576748236273">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="530" y="58" key="#com.intellij.ide.util.MemberChooser/0.0.1536.824@0.0.1536.824" timestamp="1576748236273" />
+    <state x="436" y="101" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog" timestamp="1576491308297">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="436" y="101" key="#com.intellij.refactoring.safeDelete.UnsafeUsagesDialog/0.0.1536.824@0.0.1536.824" timestamp="1576491308297" />
+    <state width="1483" height="199" key="GridCell.Tab.0.bottom" timestamp="1576498490702">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1483" height="199" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1576498490702" />
+    <state width="1483" height="199" key="GridCell.Tab.0.center" timestamp="1576498490701">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1483" height="199" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1576498490701" />
+    <state width="1483" height="199" key="GridCell.Tab.0.left" timestamp="1576498490701">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1483" height="199" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1576498490701" />
+    <state width="1483" height="199" key="GridCell.Tab.0.right" timestamp="1576498490701">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state width="1483" height="199" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1576498490701" />
+    <state x="316" y="82" width="917" height="660" key="find.popup" timestamp="1576670601605">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="316" y="82" width="917" height="660" key="find.popup/0.0.1536.824@0.0.1536.824" timestamp="1576670601605" />
+    <state x="347" y="-1" width="840" height="1034" key="search.everywhere.popup" timestamp="1576746766777">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="347" y="-1" width="840" height="1034" key="search.everywhere.popup/0.0.1536.824@0.0.1536.824" timestamp="1576746766777" />
+  </component>
+</project>
