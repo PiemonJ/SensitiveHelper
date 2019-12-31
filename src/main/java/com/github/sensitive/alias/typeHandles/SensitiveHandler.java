@@ -1,7 +1,6 @@
 package com.github.sensitive.alias.typeHandles;
 
-import com.jd.jr.absfactory.common.sensitive.alias.typeAliases.Sensitive;
-import org.apache.commons.codec.binary.Base64;
+import com.github.sensitive.alias.typeAliases.Sensitive;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.MappedTypes;
@@ -10,6 +9,7 @@ import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Base64;
 
 /**
  * 对应的JavaType的字段,必须是保证需要加密解密的
@@ -71,7 +71,7 @@ public class SensitiveHandler extends BaseTypeHandler<String> {
             return null;
 
         try {
-            boolean whetherEncrypted = Base64.isBase64(columnValue);
+            boolean whetherEncrypted = false;
             if (whetherEncrypted){
                 // 解密
                 columnValue = "解密后";

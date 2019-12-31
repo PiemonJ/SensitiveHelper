@@ -10,6 +10,6 @@ import java.lang.annotation.*;
 @Target(ElementType.PARAMETER)
 public @interface SensitiveElement {
 
-    String value();
+    String name();
 
 }

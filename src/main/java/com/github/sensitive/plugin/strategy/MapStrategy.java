@@ -21,47 +21,43 @@ public class MapStrategy extends AbstractStrategy {
         Map<String, Object> mybatisMap = (Map<String, Object>) data;
 
         if (annotation instanceof SensitiveCollection)
-            whenSensitiveCollection(annotation, mybatisMap, purpose);
+            whenSensitiveCollection((SensitiveCollection)annotation, mybatisMap, purpose);
         else if (annotation instanceof SensitiveElement)
-            whenSensitiveElement(annotation, mybatisMap, purpose);
+            whenSensitiveElement((SensitiveElement)annotation, mybatisMap, purpose);
         return data;
     }
 
 
-    public void whenSensitiveCollection(Annotation annotation, Map<String, Object> mybatisMap, Purpose purpose) {
+    public void whenSensitiveCollection(SensitiveCollection annotation, Map<String, Object> mybatisMap, Purpose purpose) {
 
-        Arrays.asList(((SensitiveCollection) annotation).elements())
-                .stream()
+        Arrays.stream(annotation.elements())
                 .forEach(
-                        element -> {
-                            String name = ((SensitiveCollection) annotation).value();
-                            Optional.ofNullable((Map<String, Object>) mybatisMap.get(name))
+                        element ->
+                            Optional.ofNullable((Map<String, Object>) mybatisMap.get(annotation.value()))
                                     .ifPresent(
                                             value -> {
                                                 whenSensitiveElement(element, value, purpose);
                                             }
-                                    );
-
-
-                        }
+                                    )
                 );
     }
 
-    public void whenSensitiveElement(Annotation annotation, Map<String, Object> mybatisMap, Purpose purpose) {
+    public void whenSensitiveElement(SensitiveElement annotation, Map<String, Object> mybatisMap, Purpose purpose) {
 
-        Stream.of((SensitiveElement) annotation)
+        Stream.of(annotation)
                 .forEach(
                         element -> {
                             String name = element.value();
-                            Optional.ofNullable(mybatisMap.get(name)).ifPresent(
-                                    value -> mybatisMap.put(
-                                            name,
-                                            StrategyPatternMatching.matching(
-                                                    value,
-                                                    element,
-                                                    purpose,
-                                                    TypeKind.MAP
-                                            ))
+                            Optional.ofNullable(mybatisMap.get(name))
+                                    .ifPresent(
+                                        value -> mybatisMap.put(
+                                                name,
+                                                StrategyPatternMatching.matching(
+                                                        value,
+                                                        element,
+                                                        purpose,
+                                                        TypeKind.MAP
+                                                ))
                             );
                         }
                 );

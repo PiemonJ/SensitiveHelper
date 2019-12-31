@@ -2,17 +2,21 @@ package com.github.sensitive.plugin.strategy;
 
 import com.github.sensitive.annotation.SensitiveCollection;
 import com.github.sensitive.annotation.SensitiveElement;
+import com.github.sensitive.annotation.SensitiveMap;
 import com.github.sensitive.annotation.SensitiveScalar;
 import com.github.sensitive.enums.Purpose;
 import com.github.sensitive.enums.TypeKind;
 import com.github.sensitive.utils.TypeClassifier;
 import org.apache.ibatis.annotations.Param;
 
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+
+import static com.github.sensitive.plugin.strategy.StrategyPatternMatching.matching;
 
 public class Context {
 
@@ -75,7 +79,7 @@ public class Context {
             switch (typeKind) {
                 case LIST:
                     // 1.方法签名中返回值是List
-                    output = StrategyPatternMatching.matching(output, typeKind, null, Purpose.DECRYPT);
+                    output = matching(output, typeKind, null, Purpose.DECRYPT);
                     break;
                 case MAP:
                 case MODEL:
@@ -83,7 +87,7 @@ public class Context {
                     // 3.方法的返回值类型是领域模型
                     ((ArrayList) output).set(
                             0,
-                            StrategyPatternMatching.matching(((ArrayList) output).get(0), typeKind, null, Purpose.DECRYPT)
+                            matching(((ArrayList) output).get(0), typeKind, null, Purpose.DECRYPT)
                     );
                     break;
                 case STRING:
@@ -101,15 +105,16 @@ public class Context {
 
     private Object onErasure(Object input) {
 
-        if (whetherNonParameter.test(method)) {
+        if (whetherParameterNonExisted.test(method)) {
             return input;
         }
         if (!hasParamAnnotation && method.getParameterTypes().length == 1) {
-            Map<String, Object> wrapper = Collections.singletonMap(DEFAULT_PARAM_NAME, input);
-            whenSensitiveAnnotation(wrapper, Purpose.ERASURE);
+            HashMap<String, Object> wrapper = new HashMap<>();
+            wrapper.put(DEFAULT_PARAM_NAME, input);
+            doing(wrapper, Purpose.ERASURE);
             input = wrapper.get(DEFAULT_PARAM_NAME);
         } else {
-            whenSensitiveAnnotation((Map<String, Object>) input, Purpose.ERASURE);
+            doing((Map<String, Object>) input, Purpose.ERASURE);
         }
 
         return input;
@@ -125,86 +130,66 @@ public class Context {
     private Object onEncrypt(Object input) {
         // 1.0 处理无参数的情况
 
-        if (whetherNonParameter.test(method)) {
+        if (whetherParameterNonExisted.test(method)) {
             return input;
         }
         if (!hasParamAnnotation && method.getParameterTypes().length == 1) {
-            Map<String, Object> wrapper = Collections.singletonMap(DEFAULT_PARAM_NAME, input);
-            whenSensitiveAnnotation(wrapper, Purpose.ENCRYPT);
+            HashMap<String, Object> wrapper = new HashMap<>();
+            wrapper.put(DEFAULT_PARAM_NAME, input);
+            doing(wrapper, Purpose.ENCRYPT);
             input = wrapper.get(DEFAULT_PARAM_NAME);
         } else {
-            whenSensitiveAnnotation((Map<String, Object>) input, Purpose.ENCRYPT);
+            doing((Map<String, Object>) input, Purpose.ENCRYPT);
         }
-
-
-//        else if (hasParamAnnotation && parameterCount == 1) {
-//            // Map 但是只有一个入参的Map
-//            Map<String, Object> mybatisMap = (Map<String, Object>) input;
-//            Annotation[] annotations = method.getParameterAnnotations()[0];
-//            Arrays.stream(annotations)
-//                    .filter(annotation ->
-//                            annotation instanceof SensitiveCollection
-//                                    || annotation instanceof SensitiveElement
-//                                    || annotation instanceof SensitiveScalar)
-//                    .findFirst()
-//                    .ifPresent(
-//                            annotation -> {
-//                                if (annotation instanceof SensitiveCollection) {
-//                                    whenSensitiveCollection(annotation,mybatisMap);
-//                                } else if (annotation instanceof SensitiveElement) {
-//                                    whenSensitiveElement(annotation,mybatisMap);
-//                                }
-//                            }
-//                    );
-//
-//        } else {
-//            whenSensitiveAnnotation((Map<String, Object>) input);
-//        }
-
         return input;
     }
 
 
-    public Predicate<Method> whetherNonParameter = method -> method.getParameterTypes().length == 0;
-
-    public Predicate<Annotation> whetherSensitiveAnnotation = annotation ->
-            annotation instanceof SensitiveCollection || annotation instanceof SensitiveElement;
 
 
-    public void whenSensitiveAnnotation(Map<String, Object> mybatisMap, Purpose purpose) {
+    public Optional<String> obtainParamName(Annotation annotation){
+        if (annotation instanceof SensitiveCollection) {
+            return Optional.ofNullable(((SensitiveCollection) annotation).name());
+        } else if (annotation instanceof SensitiveElement) {
+            return Optional.ofNullable(((SensitiveElement) annotation).name());
+        } else if (annotation instanceof SensitiveMap) {
+            return Optional.ofNullable(((SensitiveElement) annotation).name());
+        } else {
+            return Optional.empty();
+        }
 
-        Arrays.stream(method.getParameterAnnotations())
-                .map(Arrays::stream)
-                .forEach(
-                        workerUnit -> {
-                            workerUnit.filter(whetherSensitiveAnnotation)
-                                    .findFirst()
-                                    .ifPresent(
-                                            annotation -> {
-                                                Optional<String> optionName = Optional.empty();
-                                                if (annotation instanceof SensitiveCollection) {
-                                                    optionName = Optional.of(((SensitiveCollection) annotation).value());
-                                                } else if (annotation instanceof SensitiveElement) {
-                                                    optionName = Optional.of(((SensitiveElement) annotation).value());
-                                                }
-                                                optionName.ifPresent(
-                                                        name -> Optional.ofNullable(mybatisMap.get(name)).ifPresent(
-                                                                value -> mybatisMap.put(
-                                                                        name,
-                                                                        StrategyPatternMatching.matching(
-                                                                                value,
-                                                                                annotation,
-                                                                                purpose,
-                                                                                TypeKind.MAP
-                                                                        ))
-                                                        )
-                                                );
-
-                                            }
-                                    );
-                        }
-
-                );
     }
 
+    public Predicate<Method> whetherParameterNonExisted = method -> method.getParameterTypes().length == 0;
+
+    public Predicate<Annotation> whetherSensitiveAnnotated = annotation ->
+            annotation instanceof SensitiveCollection
+            || annotation instanceof SensitiveElement
+            || annotation instanceof SensitiveMap;
+
+    private void doing(Map<String, Object> mybatisMap, Purpose purpose) {
+
+        Arrays.stream(method.getParameterAnnotations())
+                .flatMap(
+                        annotations -> {
+                            return Arrays.stream(annotations)
+                                    .filter(whetherSensitiveAnnotated)
+                                    .findFirst()
+                                    .map(Stream::of)
+                                    .orElseGet(Stream::empty);
+                        }
+                ).forEach(
+                        annotation -> {
+                            obtainParamName(annotation).ifPresent(
+                                    paramName ->
+                                        Optional.ofNullable(mybatisMap.get(paramName)).ifPresent(
+                                                data -> {
+                                                    Object result = matching(data, annotation, purpose, TypeKind.MAP);
+                                                    mybatisMap.put(paramName,result);
+                                                }
+                                        )
+                            );
+                        }
+        );
+    }
 }
