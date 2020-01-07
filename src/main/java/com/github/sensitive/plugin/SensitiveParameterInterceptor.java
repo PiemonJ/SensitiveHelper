@@ -15,10 +15,11 @@ import org.apache.ibatis.session.RowBounds;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
+import java.util.Optional;
 import java.util.Properties;
 
 /**
- * 加密拦截器
+ * 加密、擦除入参拦截器
  */
 @Intercepts(
         {
@@ -29,7 +30,6 @@ import java.util.Properties;
 )
 public class SensitiveParameterInterceptor extends AbstractInterceptor {
 
-    //    private Properties properties;
     public static final String CIPHER_MARK_METHOD_NAME = "";
 
 
@@ -45,12 +45,12 @@ public class SensitiveParameterInterceptor extends AbstractInterceptor {
     public Object intercept(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
         // 根据Parameter的类型，选择适当的策略对其进行加密
-        Method method = obtainCalledMethod(invocation);
-        if (method == null) {
-            return invocation.proceed();
+        Optional<Method> method = obtainCalledMethod(invocation);
+        if (!method.isPresent()){
+            throw new Exception("an not obtain method from invocation !!! Please check your dao method name is valid or visible ");
         }
         // 创建上下文
-        Context context = Context.of(method);
+        Context context = Context.of(method.get());
         // 请求加密
         args[PARAMETER_INDEX] = context.ask(args[PARAMETER_INDEX], Purpose.ENCRYPT);
         // Invoke SQL

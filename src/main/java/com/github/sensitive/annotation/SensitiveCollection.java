@@ -11,8 +11,6 @@ import java.lang.annotation.*;
 @Target(ElementType.PARAMETER)
 public @interface SensitiveCollection {
 
-    String name();
-
-    SensitiveElement[] keys();
+    String name() default "collection";
 
 }

@@ -13,6 +13,7 @@ import org.apache.ibatis.plugin.Signature;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.sql.Statement;
+import java.util.Optional;
 import java.util.Properties;
 
 
@@ -34,8 +35,13 @@ public class SensitiveResultSetInterceptor extends AbstractInterceptor  {
             return null;
         }
         // 根据Parameter的类型，选择适当的策略对其进行加密
-        Method method = obtainCalledMethod(invocation);
-        Context context = Context.of(method);
+
+        Optional<Method> method = obtainCalledMethod(invocation);
+
+        if (!method.isPresent())
+            throw new Exception("Can not obtain method from invocation !!! Please check whether ResultSetHandler is DefaultResultSetHandler");
+
+        Context context = Context.of(method.get());
         result = context.ask(result, Purpose.DECRYPT);
         return result;
     }

@@ -12,13 +12,13 @@ public class StringStrategy extends AbstractStrategy {
      * 字符串策略是一个特殊的策略
      * 该策略不能由策略之外的对象触发
      * @param data
-     * @param annotation
+     * @param metaData
      * @param purpose
      * @return
      */
 
     @Override
-    public Object action(Object data, Annotation annotation, Purpose purpose) {
+    public Object action(Object data, MetaData metaData, Purpose purpose) {
         if (data == null)
             return null;
 

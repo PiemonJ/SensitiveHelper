@@ -1,6 +1,7 @@
 package com.github.sensitive.plugin.strategy;
 
 import com.github.sensitive.annotation.Sensitive;
+import com.github.sensitive.annotation.SensitiveVersion;
 import com.github.sensitive.enums.Purpose;
 import com.github.sensitive.enums.TypeKind;
 
@@ -8,84 +9,80 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 public class ModelStrategy extends AbstractStrategy {
 
 
-    public Optional<Field> recursionObtainField(Optional<Class<?>> clazz){
+    public Optional<Field> recursionObtainVersionField(Optional<Class<?>> clazz)  throws Throwable {
 
         if (!clazz.isPresent())
             return Optional.empty();
 
-        Optional<Field> existed = Arrays.asList(clazz.get().getDeclaredFields())
-                .stream()
-                .filter(fieldName -> fieldName.getName().equals(GLOBAL_VERSION_NAME))
-                .findFirst();
+        Optional<Field> existed = Arrays.stream(clazz.get().getDeclaredFields())
+                .filter(field -> {
+                    SensitiveVersion annotation = field.getAnnotation(SensitiveVersion.class);
+                    Optional<SensitiveVersion> optional = Optional.ofNullable(annotation);
+                    return optional.isPresent();
+                }).findFirst();
 
         if (existed.isPresent())
             return existed;
         else
-            return recursionObtainField(Optional.ofNullable(clazz.get().getSuperclass()));
+            return recursionObtainVersionField(Optional.ofNullable(clazz.get().getSuperclass()));
 
     }
 
-    public void recursionOperateField(Object data, Class clazz ,Purpose purpose,Integer boundedVersion){
+    /**
+     * 尾递归
+     * @param data
+     * @param clazz
+     * @param purpose
+     * @param boundedVersion
+     */
+    public void recursionOperateSensitiveField(Method method, Object data, Class clazz ,Purpose purpose,Integer boundedVersion) throws Throwable{
         if (clazz == null)
             return;
 
-        Arrays.stream(clazz.getDeclaredFields())
-                .filter(field -> this.versionBounded(field,boundedVersion))
-                .forEach(
-                        field -> {
-                            try {
-                                field.setAccessible(Boolean.TRUE);
-                                Object value = field.get(data);
-                                field.set(
-                                        data,
-                                        StrategyPatternMatching.matching(value,null, purpose, TypeKind.MAP));
+        // 为了把异常抛出来，不使用函数
+        for (Field field : clazz.getDeclaredFields()) {
+            Sensitive sensitive = field.getAnnotation(Sensitive.class);
 
-                            } catch (Exception e){
-                            }
-                        }
-
-                );
-
-        recursionOperateField(data,clazz.getSuperclass(),purpose,boundedVersion);
+            if (Optional.ofNullable(sensitive).isPresent()) {
+                if (versionBounded(sensitive, boundedVersion)) {
+                    field.setAccessible(Boolean.TRUE);
+                    Object value = field.get(data);
+                    Message message = Message.of(method,value, purpose,Optional.of(sensitive) ,IGNORED);
+                    field.set(data, StrategyMediator.mediator.communicate(message));
+                }
+            }
+        }
+        recursionOperateSensitiveField(method,data,clazz.getSuperclass(),purpose,boundedVersion);
 
     }
 
-    public boolean versionBounded(Field filed ,Integer boundedVersion){
+    public boolean versionBounded(Sensitive sensitive ,Integer boundedVersion) {
 
-        Optional<Sensitive> annotation = Optional.of(filed.getAnnotation(Sensitive.class));
-        if (annotation.isPresent()){
-            Sensitive sensitive = annotation.get();
-            if (boundedVersion == null || boundedVersion == 0){
-                return sensitive.version() <= 0;
-            } else {
-                return sensitive.version() <= boundedVersion;
-            }
+        if (boundedVersion == null || boundedVersion == 0){
+            return sensitive.version() <= 0;
+        } else {
+            return sensitive.version() <= boundedVersion;
         }
-        return false;
-
     }
 
 
     @Override
-    public Object action(Object data, Annotation annotation, Purpose purpose) {
+    public Object action(Object data, MetaData metaData, Purpose purpose) throws Throwable {
 
-        Optional<Field> option = recursionObtainField(Optional.of(data.getClass()));
+        Optional<Field> option = recursionObtainVersionField(Optional.of(data.getClass()));
         if (option.isPresent()){
+            //该Model是敏感的
             Field field = option.get();
             field.setAccessible(Boolean.TRUE);
-            try {
-                Integer boundedVersion = (Integer) field.get(data);
-                recursionOperateField(data,data.getClass(),purpose,boundedVersion);
-            } catch (IllegalAccessException e) {
-
-            }
+            Integer boundedVersion = (Integer) field.get(data);
+            recursionOperateSensitiveField(metaData.method,data,data.getClass(),purpose,boundedVersion);
         }
-
         return data;
     }
 }

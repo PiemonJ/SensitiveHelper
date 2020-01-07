@@ -8,8 +8,12 @@ import java.util.Optional;
 
 public interface Strategy {
 
+    static Strategy proxy(){
+        return new StrategyProxy();
+    }
 
-    public Object action(Object data, Annotation annotation, Purpose purpose);
+
+    Object action(Object data, MetaData metaData, Purpose purpose) throws Throwable;
 
 //    /**
 //     * 加密,原处修改

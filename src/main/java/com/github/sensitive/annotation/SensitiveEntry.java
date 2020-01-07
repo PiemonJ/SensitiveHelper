@@ -13,4 +13,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({})
 public @interface SensitiveEntry {
+
+    String key();
+
 }

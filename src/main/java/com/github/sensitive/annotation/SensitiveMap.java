@@ -11,7 +11,4 @@ public @interface SensitiveMap {
 
     SensitiveEntry[] entries();
 
-    SensitiveElement[] elements();
-
-    SensitiveCollection[] collections();
 }

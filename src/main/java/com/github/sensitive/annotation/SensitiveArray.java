@@ -9,4 +9,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface SensitiveArray {
+
+    String name() default "array";
+
 }

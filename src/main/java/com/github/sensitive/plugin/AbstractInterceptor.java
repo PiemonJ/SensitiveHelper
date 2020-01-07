@@ -6,6 +6,8 @@ import org.apache.ibatis.plugin.Invocation;
 
 import javax.annotation.Resource;
 import java.lang.reflect.Method;
+import java.rmi.MarshalException;
+import java.util.Optional;
 import java.util.Properties;
 
 public abstract class AbstractInterceptor implements Interceptor {
@@ -25,8 +27,8 @@ public abstract class AbstractInterceptor implements Interceptor {
 
     abstract public MappedStatement obtainMappedStatement(Invocation invocation) throws Throwable;
 
-    public Method obtainCalledMethod(Invocation invocation) throws Throwable{
-        Method action = null;
+    public Optional<Method> obtainCalledMethod(Invocation invocation) throws Throwable{
+        Optional<Method> methodOops = Optional.<Method>empty();
         MappedStatement mappedStatement = obtainMappedStatement(invocation);
         String namespace = mappedStatement.getId();
         String className = namespace.substring(0, namespace.lastIndexOf("."));
@@ -37,12 +39,12 @@ public abstract class AbstractInterceptor implements Interceptor {
             Method[] methods = Class.forName(className).getMethods();
             for (Method method : methods) {
                 if (method.getName().equals(methodName)) {
-                    action = method;
+                    methodOops = Optional.of(method);
                     break;
                 }
             }
         }
-        return action;
+        return methodOops;
     }
 
 }

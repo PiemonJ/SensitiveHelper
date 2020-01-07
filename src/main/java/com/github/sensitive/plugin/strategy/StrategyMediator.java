@@ -8,12 +8,13 @@ import com.github.sensitive.enums.Purpose;
  */
 public interface StrategyMediator {
 
+    public static final StrategyMediator mediator = new MuxStrategyMediator();
 
     /**
      * 策略间通信
      * @param message
      * @return
      */
-    Object communicate(Message message);
+    Object communicate(Message message) throws Throwable;
 
 }
