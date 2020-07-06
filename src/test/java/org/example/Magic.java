@@ -31,7 +31,7 @@ public class Magic {
 
         // 双分组
         SinkFlow<Pair<Pair<String, String>, Metric>> sink1 = Magic.from(one, two, three, four)
-                .BiGroup(data -> new Pair<>(data.getPsm(), data.getRank()))
+                .BiGroup(Data::getPsm, Data::getRank)
                 .MapReduce(data -> Metric.of(data.getWeight(), data.getValue(), data.getValue(), data.getValue()), Metric.METRIC_MONOID)
                 .Sink(x -> x);
 

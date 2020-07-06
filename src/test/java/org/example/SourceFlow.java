@@ -40,6 +40,9 @@ public class SourceFlow<T> {
         return new BiGroupedFlow<>(dataFlow.groupBy(groupFunction));
     }
 
+    public <O,I> BiGroupedFlow<O,I,T> BiGroup(Function<T,O> outerFunction,Function<T,I> innerFunction){
 
+        return BiGroup(data -> new Pair<>(outerFunction.apply(data),innerFunction.apply(data)));
+    }
 
 }
