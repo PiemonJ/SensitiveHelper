@@ -2,15 +2,8 @@ package org.example;
 
 
 import io.reactivex.Observable;
-import io.reactivex.Single;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
-import io.reactivex.observables.GroupedObservable;
-import org.checkerframework.checker.units.qual.K;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
 
 
 public class SourceFlow<T> {
@@ -42,6 +35,10 @@ public class SourceFlow<T> {
         return new GroupedFlow<>(dataFlow.groupBy(groupFunction));
     }
 
+    public <O,I> BiGroupedFlow<O,I,T> BiGroup(Function<T,Pair<O,I>> groupFunction){
+
+        return new BiGroupedFlow<>(dataFlow.groupBy(groupFunction));
+    }
 
 
 

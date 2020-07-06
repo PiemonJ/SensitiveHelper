@@ -1,6 +1,8 @@
 package org.example;
 
 
+import io.reactivex.functions.Function;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +28,20 @@ public class Magic {
         Data three = new Data("二班", "2020-07-04", "迟到", BigDecimal.ONE, BigDecimal.ONE);
         Data four = new Data("二班", "2020-07-05", "不迟到", BigDecimal.ONE, BigDecimal.ONE);
 
+
+        // 双分组
+        SinkFlow<Pair<Pair<String, String>, Metric>> sink1 = Magic.from(one, two, three, four)
+                .BiGroup(data -> new Pair<>(data.getPsm(), data.getRank()))
+                .MapReduce(data -> Metric.of(data.getWeight(), data.getValue(), data.getValue(), data.getValue()), Metric.METRIC_MONOID)
+                .Sink(x -> x);
+
+        Map<Pair<String, String>, BigDecimal> pairBigDecimalMap =
+                sink1.CollectMap(Pair::getKey, kv -> kv.getValue().getValue().divide(kv.getValue().getWeight()));
+
+
+
+
+        // 单分组
         SinkFlow<Pair<String, Metric>> sink = Magic.from(one, two, three, four)
                 .Group(Data::getRank)
                 .MapReduce(data -> Metric.of(data.getWeight(), data.getValue(), data.getValue(), data.getValue()), Metric.METRIC_MONOID)
