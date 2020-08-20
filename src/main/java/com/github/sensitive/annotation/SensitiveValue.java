@@ -2,10 +2,9 @@ package com.github.sensitive.annotation;
 
 import java.lang.annotation.*;
 
-@Inherited
-@Target({ElementType.FIELD, ElementType.TYPE})
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SensitiveVersion {
-
+@Target(ElementType.PARAMETER)
+public @interface SensitiveValue {
 
 }

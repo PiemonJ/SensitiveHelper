@@ -1,5 +1,9 @@
 package com.github.sensitive.plugin.strategy;
 
+import com.github.sensitive.common.Either;
+import com.github.sensitive.common.Pair;
+import com.github.sensitive.common.SensitiveMetadataEntry;
+import com.github.sensitive.common.Try;
 import com.github.sensitive.enums.Purpose;
 
 import java.lang.annotation.Annotation;
@@ -8,31 +12,16 @@ import java.util.Optional;
 
 public interface Strategy {
 
-    static Strategy proxy(){
-        return new StrategyProxy();
-    }
+    ArrayStrategy ARRAY_STRATEGY = new ArrayStrategy();
 
+    ListStrategy LIST_STRATEGY = new ListStrategy();
 
-    Object action(Object data, MetaData metaData, Purpose purpose) throws Throwable;
+    MapStrategy MAP_STRATEGY = new MapStrategy();
 
-//    /**
-//     * 加密,原处修改
-//     * @param param
-//     * @param annotation
-//     */
-//    public Object encrypt(Object param, Annotation annotation);
-//
-//    /**
-//     * 擦除
-//     * @param param
-//     * @param annotation
-//     */
-//    public Object erasure(Object param, Annotation annotation);
-//
-//    /**
-//     * 解密,原处修改
-//     * @param result
-//     * @param annotation
-//     */
-//    public Object decrypt(Object result, Annotation annotation);
+    StringStrategy STRING_STRATEGY = new StringStrategy();
+
+    ModelStrategy MODEL_STRATEGY = new ModelStrategy();
+
+    Try<Object> action(Message message) throws Throwable;
+
 }

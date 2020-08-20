@@ -1,59 +1,46 @@
 package com.github.sensitive.plugin.strategy;
 
-import com.github.sensitive.enums.Purpose;
-import com.github.sensitive.enums.TypeKind;
-import com.github.sensitive.utils.TypeClassifier;
-
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
+import com.github.sensitive.common.Try;
+import java.util.Optional;
 
 public class MuxStrategyMediator implements StrategyMediator {
 
-    public ListStrategy listStrategy;
-
-    public MapStrategy mapStrategy;
-
-    public StringStrategy stringStrategy;
-
-    public ModelStrategy modelStrategy;
-
     @Override
-    public Object communicate(Message message) throws Throwable {
+    public Try<Object> communicate(Message message) {
 
-        if (message.getAnnotation().isPresent()) {
-            Object payload = message.getPayload();
-            TypeKind typeKind = TypeClassifier.classify(payload);
-            if (!message.getIgnoredTypeKind().contains(typeKind)){
-                return matching(payload, typeKind, MetaData.of(message.method,message.annotation), message.getPurpose());
-            }
-        }
-        return message.getPayload();
+        return Optional.of(message)
+                .filter(msg -> msg.getAnnotation().isPresent())
+                .filter(msg -> msg.getIgnoredTypeKind().contains(message.getTypeKind()))
+                .map(this::matching)
+                .orElseGet(() -> Try.success(message.getPayload()));
 
     }
 
-    public Object matching(Object data, TypeKind typeKind, MetaData metaData, Purpose purpose) throws Throwable {
-        switch (typeKind){
+    /**
+     * Low版模式匹配
+     * @param message
+     * @return
+     */
+    public Try<Object> matching(Message message) {
+        switch (message.getTypeKind()) {
+            case ARRAY:
+                return Strategy.ARRAY_STRATEGY.action(message);
             case LIST:
                 // 递归
-                data = listStrategy.action(data, metaData, purpose);
-                break;
+                return Strategy.LIST_STRATEGY.action(message);
             case MAP:
                 // 可能会出现这种情况,但是一般不会出现
-                data = mapStrategy.action(data, metaData, purpose);
-                break;
+                return Strategy.MAP_STRATEGY.action(message);
             case STRING:
                 // List列表中数据是基础数据类型
-                data = stringStrategy.action(data, metaData, purpose);
-                break;
+                return Strategy.STRING_STRATEGY.action(message);
             case MODEL:
                 // 假定是领域模型
-                data = modelStrategy.action(data, metaData, purpose);
-                break;
+                return Strategy.MODEL_STRATEGY.action(message);
             case PRIMITIVE:
             case UNKNOWN:
             default:
-                break;
+                return Try.success(message.getPayload());
         }
-        return data;
     }
 }

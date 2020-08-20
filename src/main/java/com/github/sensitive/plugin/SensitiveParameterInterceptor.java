@@ -1,7 +1,7 @@
 package com.github.sensitive.plugin;
 
 import com.github.sensitive.enums.Purpose;
-import com.github.sensitive.plugin.strategy.Context;
+import com.github.sensitive.plugin.context.Context;
 import org.apache.ibatis.cache.CacheKey;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.BoundSql;
@@ -13,7 +13,6 @@ import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
-import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.Properties;
@@ -30,9 +29,6 @@ import java.util.Properties;
 )
 public class SensitiveParameterInterceptor extends AbstractInterceptor {
 
-    public static final String CIPHER_MARK_METHOD_NAME = "";
-
-
     /**
      * 该拦截器主要处理查询命令中入参的加密
      * PS:无法处理纯字符串的入参
@@ -46,7 +42,7 @@ public class SensitiveParameterInterceptor extends AbstractInterceptor {
         Object[] args = invocation.getArgs();
         // 根据Parameter的类型，选择适当的策略对其进行加密
         Optional<Method> method = obtainCalledMethod(invocation);
-        if (!method.isPresent()){
+        if (!method.isPresent()) {
             throw new Exception("an not obtain method from invocation !!! Please check your dao method name is valid or visible ");
         }
         // 创建上下文
@@ -79,15 +75,16 @@ public class SensitiveParameterInterceptor extends AbstractInterceptor {
      */
     @Override
     public void setProperties(Properties properties) {
-//        if (properties != null)
-//            this.properties = properties;
+        if (properties != null) {
+            this.properties = properties;
+        }
     }
 
     @Override
     public MappedStatement obtainMappedStatement(Invocation invocation) throws Throwable {
         Object[] args = invocation.getArgs();
         // mappedStatement
-        MappedStatement mappedStatement = (MappedStatement) args[MAPPED_STATEMENT_INDEX];
-        return mappedStatement;
+        assert args[MAPPED_STATEMENT_INDEX] instanceof MappedStatement;
+        return (MappedStatement) args[MAPPED_STATEMENT_INDEX];
     }
 }

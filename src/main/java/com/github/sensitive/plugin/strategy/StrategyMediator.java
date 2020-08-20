@@ -1,6 +1,8 @@
 package com.github.sensitive.plugin.strategy;
 
-import com.github.sensitive.enums.Purpose;
+
+import com.github.sensitive.common.Either;
+import com.github.sensitive.common.Try;
 
 /**
  * 策略中介者
@@ -8,13 +10,13 @@ import com.github.sensitive.enums.Purpose;
  */
 public interface StrategyMediator {
 
-    public static final StrategyMediator mediator = new MuxStrategyMediator();
+    StrategyMediator mediator = new MuxStrategyMediator();
 
     /**
      * 策略间通信
      * @param message
      * @return
      */
-    Object communicate(Message message) throws Throwable;
+    Try<Object> communicate(Message message) throws Throwable;
 
 }

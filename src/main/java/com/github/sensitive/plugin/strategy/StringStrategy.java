@@ -1,5 +1,7 @@
 package com.github.sensitive.plugin.strategy;
 
+import com.github.sensitive.common.SensitiveMetadataEntry;
+import com.github.sensitive.crypto.Cipher;
 import com.github.sensitive.enums.Purpose;
 
 import java.lang.annotation.Annotation;
@@ -11,23 +13,39 @@ public class StringStrategy extends AbstractStrategy {
     /**
      * 字符串策略是一个特殊的策略
      * 该策略不能由策略之外的对象触发
-     * @param data
-     * @param metaData
-     * @param purpose
+     *
      * @return
      */
 
     @Override
-    public Object action(Object data, MetaData metaData, Purpose purpose) {
-        if (data == null)
+    protected Object doAction(Message message) throws Throwable {
+        Object data = message.getPayload();
+        if (data == null) {
             return null;
+        }
+        assert data instanceof String;
 
-        switch (purpose) {
+        Cipher cipher = new Cipher() {
+            @Override
+            public String encryption(String literal) {
+                return null;
+            }
+
+            @Override
+            public String decryption(String literal) {
+                return null;
+            }
+        };
+
+        switch (message.getPurpose()) {
             case ENCRYPT:
+                data = cipher.encryption((String)data);
                 break;
             case ERASURE:
-                break;
             case DECRYPT:
+                data = cipher.decryption((String)data);
+                break;
+            default:
                 break;
         }
         return data;

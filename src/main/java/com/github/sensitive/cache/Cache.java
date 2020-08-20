@@ -1,11 +1,11 @@
 package com.github.sensitive.cache;
 
 import java.util.Optional;
+import java.util.concurrent.Callable;
 
-public interface Cache<K,V> {
+public interface Cache<K, V> {
 
-    Optional<V> obtain(K key);
+    Optional<V> cas(K key, Callable<V> callback) throws Exception;
 
-    void setting(K key,V value);
 
 }

@@ -4,6 +4,8 @@ import com.google.common.cache.CacheBuilder;
 
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 
 public class GuavaCache<K, V> implements Cache<K, V> {
 
@@ -18,13 +20,11 @@ public class GuavaCache<K, V> implements Cache<K, V> {
 
 
     @Override
-    public Optional<V> obtain(K key) {
+    public Optional<V> cas(K key, Callable<V> callback) throws ExecutionException {
 
-        return Optional.ofNullable(CACHE.getIfPresent(key));
+        return Optional.ofNullable(CACHE.get(key,callback));
+
     }
 
-    @Override
-    public void setting(K key, V value) {
-        CACHE.put(key,value);
-    }
+
 }
